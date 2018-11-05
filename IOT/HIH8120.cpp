@@ -20,8 +20,7 @@ namespace exploringBB
 
 
 
-  public HIH8120::HIH8120(unsigned int I2CBus, unsigned int SENSOR):
-
+  HIH8120::HIH8120(unsigned int I2CBus, unsigned int I2CAddress ):
    I2CDevice(I2CBus, I2CAddress)
   {
 	this->I2CAddress = I2CAddress;
@@ -33,20 +32,20 @@ namespace exploringBB
 	  int humidity;
 	  int temp;
 	  char bytes [];
-	  write(0);
+	  I2CDevice().write(0);
 	  sleep(1);
-	 bytes=readDevice(4);
-	 data = bytes[0] << 8 | data[1];
-	 humidity =  bytes[2] << 8 | data[3];
+	 bytes=I2CDevice().readDevice(4);
+	  humidity = bytes[0] << 8 | bytes[1];
+	 humidity =  bytes[2] << 8 | bytes[3];
 	  temp=temp >> 2;
 	  humidity= (humidity / (2^14 - 2))*100;
-	  temperature =(temperature / (2^14 - 2)) * (165-40);
+	  temp =(temp / (2^14 - 2)) * (165-40);
 	 //what value should it be in here ??
       // char array ? that takes the readDevice() and then what
 	  // do some calculations
 	 // How to do the calculations
-	  printf(humidity);
-	  printf(temperature);
+	  printf("%d",humidity);
+	  printf("%d",temp);
   }
 
 }
