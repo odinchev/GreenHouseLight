@@ -1,5 +1,5 @@
 #include <iostream>
-//#include <uninstd.h>
+#include <uninstd.h>
 #include <pthread.h>
 #include "HIH8120.h"
 
