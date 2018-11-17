@@ -13,12 +13,20 @@
 #include <string.h>
 #include <stdbool.h>
 #include "string.h"
+#include<fstream>
+#include<string>
+#include<sstream>
+
+#include "HIH8120.h"
 
 #include<iostream>
 //placed in the current directory for ease of use
 
 
 using namespace std;
+using namespace exploringBB;
+string LDR_PATH = "/sys/bus/iio/devices/iio:device0/in_voltage";
+
 
 
 
@@ -26,6 +34,7 @@ using namespace std;
 
 
 void changeBrightness( std::string mode , int value); // function prototypes controlls brighness by adjusting period
+int readAnalog(int number);
 bool checkPWM( std::string mode);
 bool enablePWM( std::string mode);
 
@@ -39,8 +48,8 @@ int main(int argc, char* argv[])
 	char argument;
 	char* p;
 	p = &argument;
-//    std::string value;
-//	value(argv[2]);
+	//    std::string value;
+	//	value(argv[2]);
 
 
 	if(strcmp(argv[1],"LED")==0)
@@ -106,6 +115,25 @@ int main(int argc, char* argv[])
 		printf("Finished the MotorControl program \n");
 		return 0;
 	}
+	else if (strcmp(argv[1],"LightMeter")==0)
+	{
+		printf("starting the LightMeter program \n");
+
+		int value = readAnalog(0);
+		cout << "the ldr value was "<< value << "out of 4095" << endl;
+		return 0;
+	}
+	else if (strcmp(argv[1],"HumidityMeter")==0)
+	{
+		printf("starting the HumidityMeter program \n");
+
+		unsigned int i2c_bus = 2 ;
+		HIH8120 sensor(i2c_bus,0x27);
+		sensor.displayData();
+		return 0;
+	}
+
+
 }
 
 void changeBrightness(std::string mode , int value)
@@ -241,3 +269,17 @@ bool enablePWM(std::string mode)
 
 
 }
+int readAnalog (int number)
+{
+	stringstream ss ;
+
+	ss << LDR_PATH << number   << "_raw";
+	fstream fs;
+	fs.open(ss.str().c_str(),fstream::in);
+	fs >> number;
+	fs.close();
+
+	return number;
+
+}
+
