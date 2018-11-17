@@ -1,12 +1,10 @@
 #include <iostream>
-#include <uninstd.h>
-#include <pthread.h>
+
+
 #include "HIH8120.h"
-
 //using namespace std;
+using namespace exploringBB;
 
-namespace exploringBB
-{
 
 int main(int argc , char* argv[])
 {
@@ -19,8 +17,8 @@ int main(int argc , char* argv[])
 		}
 		else
 		{
-			std::cout << "Usage:"<< argv[0] << "[i2c_bus] \r\n";
-			std::cout << "i2c-bus is either 0,1 or 2. Default is 2 \r\n";
+			std::cout<< "Usage:"<< argv[0] << "[i2c_bus] \r\n";
+			std::cout<< "i2c-bus is either 0,1 or 2. Default is 2 \r\n";
 			return 1;
 		}
 	}
@@ -29,4 +27,4 @@ int main(int argc , char* argv[])
 	return 0;
 
 }
-}
+

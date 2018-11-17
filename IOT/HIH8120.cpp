@@ -10,7 +10,8 @@
 #include <unistd.h>
 #include <math.h>
 #include <stdio.h>
-
+#include "string.h"
+//${COMMAND} ${FLAGS} -E -P -v -dD "${INPUTS}"
 using namespace std;
 
 namespace exploringBB
@@ -20,32 +21,53 @@ namespace exploringBB
 
 
 
-  HIH8120::HIH8120(unsigned int I2CBus, unsigned int I2CAddress ):
-   I2CDevice(I2CBus, I2CAddress)
+  HIH8120::HIH8120(unsigned int I2CBus, unsigned int I2CAddress ):I2CDevice(I2CBus, I2CAddress)
   {
+
 	this->I2CAddress = I2CAddress;
 	this->I2CBus = I2CBus;
   }
 
-  void displayData()
+ void  HIH8120::displayData()
   {
-	  int humidity;
-	  int temp;
-	  char bytes [];
-	  I2CDevice().write(0);
-	  sleep(1);
-	 bytes=I2CDevice().readDevice(4);
-	  humidity = bytes[0] << 8 | bytes[1];
-	 humidity =  bytes[2] << 8 | bytes[3];
-	  temp=temp >> 2;
-	  humidity= (humidity / (2^14 - 2))*100;
-	  temp =(temp / (2^14 - 2)) * (165-40);
-	 //what value should it be in here ??
-      // char array ? that takes the readDevice() and then what
-	  // do some calculations
-	 // How to do the calculations
-	  printf("%d",humidity);
-	  printf("%d",temp);
+	  double humidity;
+	  double temp;
+	  int humidityADC;
+	  int tempADC;
+	  //char bytes [4] ;
+
+
+	  I2CDevice device(2, 0x27);
+	  device.write(0);
+      sleep(1);
+	  char deviceData [4] ={*device.readDevice(4)};
+
+
+
+
+	 //bytes= device.readDevice(4);
+	 // strcpy(bytes,deviceData);
+
+
+	  // store the bytes into variables for humidity and temperature and shift the bits
+	  humidityADC = deviceData[0] << 8 | deviceData[1];
+	  tempADC =  deviceData[2] << 8 | deviceData[3];
+	  tempADC=tempADC >> 2;
+	  // convert the adc output into percent and degrees
+	  humidity= (humidityADC / (2^14 - 2))*100;
+	  temp =(tempADC / (2^14 - 2)) * 165-40;
+
+
+
+
+	//   std::cout << " humidity(adc) is "<< humidityADC << "\n" ;
+	//    std::cout << "temperature(adc) is "<< tempADC << "\n" ;
+
+
+
+	 // print the values for the humidity and temperature
+	  std::printf("humidity %d  \n",humidity );
+	  std::printf("temperature %d  \n",temp );
   }
 
 }
