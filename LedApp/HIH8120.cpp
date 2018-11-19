@@ -49,8 +49,8 @@ namespace exploringBB
 			  std::cout << "device data ["<< i << "]" << "is" << deviceData[i] << endl;
 		  }
 		  
-		  humidityADC = deviceData[0] << 8 | deviceData[1];
-	      tempADC =  deviceData[2] << 8 | deviceData[3];
+		  humidityADC = (deviceData[0] << 8 )| deviceData[1];
+	      tempADC =  (deviceData[2] << 8 )| deviceData[3];
 	      tempADC=tempADC >> 2;
 	  // convert the adc output into percent and degrees
 	      humidity= (humidityADC / (2^14 - 2))*100;

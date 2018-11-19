@@ -22,10 +22,9 @@
 #include<iostream>
 //placed in the current directory for ease of use
 
-
 using namespace std;
 using namespace exploringBB;
-string LDR_PATH = "/sys/bus/iio/devices/iio:device0/in_voltage";
+string LDR_PATH = "/sys/bus/iio/devices/iio\:device0/in_voltage";
 
 
 
@@ -133,6 +132,48 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
+	if(strcmp(argv[1],"Heater")==0)
+	{
+
+
+
+		printf("starting the Heater Program \n");
+
+		printf("checking if pwm is enabled \n");
+
+		if(checkPWM("Heater")== true)
+		{
+			printf("pwm is enabled \n");
+		}
+		else
+		{
+			printf("pwm is not enabled. enabling pwm \n");
+
+			enablePWM("Heater");
+			checkPWM("Heater");
+
+		}
+
+
+
+		string input = argv[2] ;
+		if(input == "on")
+		{
+			changeBrightness("Heater" ,200000);
+		}
+		else
+		{
+			changeBrightness("Heater" , 0);
+		}
+
+
+
+
+
+		printf("Finished the Heater program \n");
+		return 0;
+	}
+
 
 }
 
@@ -190,6 +231,29 @@ void changeBrightness(std::string mode , int value)
 		fprintf(fp,"%s","1");
 		fclose(fp);
 	}
+	if(mode == "Heater")
+	{
+
+		printf("setting period \n");
+		fp = fopen("/sys/class/pwm/pwmchip3/pwm-3:0/period","w");
+		printf(" cd into pwm-3:1\ \n");
+		fprintf(fp,"%d",20000000);
+
+		fclose(fp);
+		printf("period is set \n ");
+
+		printf("setting duty_cycle \n");
+		fp = fopen("/sys/class/pwm/pwmchip3/pwm-3:0/duty_cycle","w");
+		fprintf(fp,"%d",dutyTime);
+		fclose(fp);
+		printf("duty_cycle is set \n");
+
+
+		fp = fopen("/sys/class/pwm/pwmchip3/pwm-3:0/enable","w");
+		fprintf(fp,"%s","1");
+		fclose(fp);
+		//system("sh -c \"echo 1 > enable\"");
+	}
 
 
 
@@ -202,40 +266,125 @@ bool checkPWM(std::string mode)
 
 	char fullFileName[100];
 
-	if(sprintf(fullFileName, "/sys/class/pwm/pwmchip1/export")==-1)
-	{
-		printf("failed to open the export file");
-		return false;
-	}
-	else
-	{
-		fp = fopen(fullFileName,"w"); // reading text now
+	//	if(sprintf(fullFileName, "/sys/class/pwm/pwmchip1/export")==-1)
+	//	{
+	//		printf("failed to open the export file");
+	//		return false;
+	//	}
+	//	else
+	//	{
+	//		fp = fopen(fullFileName,"w"); // reading text now
+	//
+	//		if (mode == "Motor")
+	//		{
+	//			fprintf(fp,"%s","0");
+	//		}
+	//		else
+	//		{
+	//			fprintf(fp,"%s","1");
+	//		}
+	//		fclose(fp);
+	//		system("sleep 1");
+	//		printf("sleeping for 1 seccond");
+	//
+	//		if (mode == "Motor")
+	//		{
+	//			enablePWM("Motor");
+	//
+	//		}
+	//		else
+	//		{
+	//			enablePWM("LED");
+	//
+	//		}
+	//
+	//
+	//		return true;
+	//	}
 
-		if (mode == "Motor")
+	if(mode == "LED")
+	{
+		if(sprintf(fullFileName, "/sys/class/pwm/pwmchip1/export")==-1)
 		{
-			fprintf(fp,"%s","0");
+			printf("failed to open the export file");
+			return false;
 		}
 		else
 		{
+			fp = fopen(fullFileName,"w"); // reading text now
+
+
+
 			fprintf(fp,"%s","1");
-		}
-		fclose(fp);
-		system("sleep 1");
-		printf("sleeping for 1 seccond");
 
-		if (mode == "Motor")
-		{
-			enablePWM("Motor");
+			fclose(fp);
+			system("sleep 1");
+			printf("sleeping for 1 seccond");
 
-		}
-		else
-		{
+
+
 			enablePWM("LED");
 
+
 		}
 
 
-		return true;
+	}
+	if(mode == "Motor")
+	{
+		if(sprintf(fullFileName, "/sys/class/pwm/pwmchip1/export")==-1)
+		{
+			printf("failed to open the export file");
+			return false;
+		}
+		else
+		{
+			fp = fopen(fullFileName,"w"); // reading text now
+
+
+
+			fprintf(fp,"%s","0");
+
+			fclose(fp);
+			system("sleep 1");
+			printf("sleeping for 1 seccond");
+
+
+
+			enablePWM("Motor");
+
+
+		}
+
+
+	}
+	if(mode == "Heater")
+	{
+		if(sprintf(fullFileName, "/sys/class/pwm/pwmchip3/export")==-1)
+		{
+			printf("failed to open the export file");
+			return false;
+		}
+		else
+		{
+			fp = fopen(fullFileName,"w"); // reading text now
+
+
+
+			fprintf(fp,"%s","1");
+
+			fclose(fp);
+			system("sleep 1");
+			printf("sleeping for 1 seccond");
+
+
+
+			enablePWM("Heater");
+
+
+		}
+
+
 	}
 }
 
@@ -253,6 +402,13 @@ bool enablePWM(std::string mode)
 	else if (mode == "Motor")
 	{
 		if(system("config-pin -a  P9-22 pwm")== -1)
+		{
+			return false;
+		}
+	}
+	else if (mode == "Heater")
+	{
+		if(system("config-pin -a  P9-14 pwm")== -1)
 		{
 			return false;
 		}
